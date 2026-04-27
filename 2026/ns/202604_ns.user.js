@@ -207,6 +207,19 @@ function validatePoint5() {
     }
 }
 
+function validatePoint11() {
+    const point11Val = val(point11);
+    const point12Val = val(point12);
+    const point14Val = val(point14);
+    const sum = point12Val + point14Val;
+    const controlSpan = document.getElementById(point11.name + '-control');
+    if (controlSpan) {
+        controlSpan.innerHTML = `т.12 + т.14 = т.11 <br>`;
+        controlSpan.innerHTML += `${point12Val} + ${point14Val} = ${sum}`;
+        validate(point11, point11Val === sum);
+    }
+}
+
 // ============================================================
 // Основна логика за свързване на полетата и добавяне на контролни суми
 // ============================================================
@@ -255,12 +268,21 @@ const point11 = document.querySelector('input[name="t11"]');
 const point12 = document.querySelector('input[name="t12"]');
 const point14 = document.querySelector('input[name="t14"]');
 
+if (!point11) {
+    return;
+}
+
 // Отворен е протокол от избори, но не са налични полетата за машинно гласуване
 // т.е. само за хартиени бюлетини, затова не правим нищо и не показваме грешки
 if (!point11 || !point12 || !point14) {
+    console.warn('Machine voting fields not found, retrying...');
+    setTimeout(() => location.reload(), 1000);
     return;
 }
 
 const machineParties = parseSection('13. РАЗПРЕДЕЛЕНИЕ НА ГЛАСОВЕТЕ ПО КАНДИДАТСКИ ЛИСТИ ОТ БЮЛЕТИНИТЕ ОТ МАШИННО ГЛАСУВАНЕ');
+addControlSpan(point11, 'т.12 + т.14 = т.11');
+[point11, point12, point14].forEach(input => input.addEventListener('input', validatePoint11));
+
 addSumDisplay(machineParties[0]?.root, machineParties, point14);
 addPrefSumDisplays(machineParties, 'cm');
